@@ -1,0 +1,12 @@
+diff --git a/package.json b/package.json
+index 98906d859aac892bd0b9b8f2a03777ec17dc4afe..4704ad0edb48a3d992cf3f61e6b3324849c51ef0 100644
+--- a/package.json
++++ b/package.json
+@@ -6,6 +6,7 @@
+   "bin": "dist/timed-cache.cjs.js",
+   "main": "dist/timed-cache.cjs.js",
+   "module": "dist/timed-cache.esm.js",
++  "types": "dist/types/main.d.ts",
+   "repository": {
+     "type": "git",
+     "url": "git+https://github.com/avolgha/timed-cache.git"

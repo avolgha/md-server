@@ -1,0 +1,10 @@
+# pnpm and nodejs
+node_modules
+pnpm-lock.yaml
+
+# buid files
+dist
+*.tsbuildinfo
+
+# test files
+test.*
