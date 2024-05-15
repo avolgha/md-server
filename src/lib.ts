@@ -1,20 +1,22 @@
 import TimedCache from "@avolgha/timed-cache";
+import shiki from "@shikijs/markdown-it";
 import dompurify from "dompurify";
 import fastify from "fastify";
 import fs from "fs";
 import fsp from "fs/promises";
 import dom from "jsdom";
-import { marked } from "marked";
+import markdownIt from "markdown-it";
 import path from "path";
 import url from "url";
 import { lazy } from "./lazy.js";
 
-// TODO(avolgha): Use Shiki to format code (https://shiki.style/)
+// TODO(avolgha): sidebar on website for navigation between markdown files.
 
+const md = markdownIt();
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 const defaultNotFoundPage = lazy(() =>
-  marked(
+  md.render(
     `# 404 - Not Found
 
 The page you were looking for could not be found.
@@ -48,11 +50,7 @@ async function getHtml(file: string) {
   const purify = dompurify(jsdom.window);
 
   const content = await fsp.readFile(file, "utf-8");
-  const html = await marked(content, {
-    async: true,
-    silent: true,
-    gfm: true,
-  });
+  const html = md.render(content);
 
   return purify.sanitize(html);
 }
@@ -91,6 +89,15 @@ export async function startServer({
       `Server cannot be created in a non-existing directory. (${workingDir})`
     );
   }
+
+  md.use(
+    await shiki({
+      themes: {
+        light: "vitesse-light",
+        dark: "vitesse-dark",
+      },
+    })
+  );
 
   const markdownCache = new TimedCache<string>(600_000); // 600_000s == 10 minutes
   const userStyles = await getUserStyles(workingDir);
