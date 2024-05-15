@@ -7,21 +7,23 @@ import dom from "jsdom";
 import { marked } from "marked";
 import path from "path";
 import url from "url";
+import { lazy } from "./lazy.js";
 
 // TODO(avolgha): Use Shiki to format code (https://shiki.style/)
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-const defaultNotFoundPage = marked(
-  `# 404 - Not Found
+const defaultNotFoundPage = lazy(() =>
+  marked(
+    `# 404 - Not Found
 
 The page you were looking for could not be found.
 `,
-  { async: false }
+    { async: false }
+  )
 );
-const defaultStyles = fs.readFileSync(
-  path.join(__dirname, "..", "defaultStyles.css"),
-  "utf-8"
+const defaultStyles = lazy(() =>
+  fs.readFileSync(path.join(__dirname, "..", "defaultStyles.css"), "utf-8")
 );
 
 export interface MdServerOptions {
@@ -58,7 +60,7 @@ async function getHtml(file: string) {
 async function getUserStyles(dir: string) {
   const filepath = path.join(dir, "styles.css");
   if (!fs.existsSync(filepath)) {
-    return defaultStyles;
+    return defaultStyles();
   }
   return await fsp.readFile(filepath, "utf-8");
 }
@@ -66,7 +68,7 @@ async function getUserStyles(dir: string) {
 function getNotFoundPage(dir: string) {
   const filepath = path.join(dir, "404.md");
   if (!fs.existsSync(filepath)) {
-    return () => Promise.resolve(defaultNotFoundPage);
+    return () => Promise.resolve(defaultNotFoundPage());
   }
   return () => getHtml(filepath);
 }
